@@ -313,7 +313,7 @@ const STYLES = `
 `;
 
 const VIDEO_STYLES = ["Educational", "Listicle", "Documentary", "Story-Time", "Expose / Deep-Dive", "Motivational"];
-const DURATIONS = ["3–5 min", "7–10 min", "12–15 min", "20+ min"];
+const DURATIONS = ["30–60 sec", "3–5 min", "7–10 min", "12–15 min", "20+ min"];
 const TONES = ["Calm & Authoritative", "Hype & Energetic", "Dark & Mysterious", "Conversational"];
 
 function CopyButton({ text }) {
@@ -576,7 +576,7 @@ The script array should have 6–10 sections appropriate for the target duration
 
         <footer className="footer">
           <span className="footer-mark">VaultScript</span>
-          <span>Powered by Claude AI</span>
+          <span>© 2026 VaultScript · All rights reserved</span>
         </footer>
       </div>
     </>
