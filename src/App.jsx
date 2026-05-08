@@ -1,341 +1,272 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 
 const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #0d0d0d;
-    --surface: #141414;
-    --card: #1a1a1a;
-    --border: #2a2a2a;
-    --amber: #f59e0b;
-    --amber-dim: #92600a;
-    --amber-glow: rgba(245,158,11,0.12);
-    --amber-glow2: rgba(245,158,11,0.06);
-    --text: #e8e0d0;
-    --muted: #6b6460;
-    --muted2: #3d3835;
-    --red: #ef4444;
+    --bg: #060608;
+    --surface: #0d0d10;
+    --card: #111116;
+    --card2: #16161c;
+    --border: #1e1e26;
+    --border2: #252530;
+    --blue: #5b7cfa;
+    --blue-dim: rgba(91,124,250,0.12);
+    --blue-glow: rgba(91,124,250,0.07);
+    --blue-border: rgba(91,124,250,0.28);
+    --text: #ececf1;
+    --text2: #9090a8;
+    --muted: #50505f;
+    --muted2: #252530;
+    --green: #34d399;
+    --red: #f87171;
   }
 
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'DM Mono', monospace;
+    font-family: 'Inter', sans-serif;
     min-height: 100vh;
-    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .noise {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.025;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    background-size: 128px;
+  .grid-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(91,124,250,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(91,124,250,0.025) 1px, transparent 1px);
+    background-size: 52px 52px;
   }
-
-  .glow-orb {
-    position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
-    width: 700px; height: 500px; pointer-events: none; z-index: 0;
-    background: radial-gradient(ellipse at center, rgba(245,158,11,0.08) 0%, transparent 70%);
+  .glow {
+    position: fixed; top: -350px; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 700px; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at center, rgba(91,124,250,0.055) 0%, transparent 65%);
   }
 
   .app {
     position: relative; z-index: 1;
-    max-width: 860px; margin: 0 auto;
-    padding: 0 24px 80px;
+    max-width: 780px; margin: 0 auto;
+    padding: 0 24px 100px;
   }
 
-  /* ── HEADER ── */
   .header {
-    padding: 52px 0 40px;
+    padding: 56px 0 48px;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 48px;
+    margin-bottom: 52px;
   }
+  .header-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 32px;
+  }
+  .logo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 20px;
+    letter-spacing: -0.03em; color: var(--text);
+  }
+  .logo span { color: var(--blue); }
   .header-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    background: var(--amber-glow); border: 1px solid var(--amber-dim);
-    border-radius: 2px; padding: 4px 10px;
-    font-size: 10px; letter-spacing: 0.2em; color: var(--amber);
-    text-transform: uppercase; margin-bottom: 20px;
+    background: var(--blue-dim); border: 1px solid var(--blue-border);
+    border-radius: 100px; padding: 5px 13px;
+    font-size: 11px; font-weight: 600; color: var(--blue);
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
   .header-badge::before {
-    content: ''; width: 6px; height: 6px; border-radius: 50%;
-    background: var(--amber); box-shadow: 0 0 8px var(--amber);
-    animation: pulse 2s ease-in-out infinite;
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--blue); box-shadow: 0 0 6px var(--blue);
+    animation: blink 2.5s ease-in-out infinite;
   }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
 
   h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(52px, 8vw, 88px);
-    letter-spacing: 0.02em;
-    line-height: 0.9;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: clamp(34px, 5.5vw, 52px);
+    letter-spacing: -0.04em; line-height: 1.08;
     color: var(--text);
   }
-  h1 span { color: var(--amber); }
+  h1 em { font-style: normal; color: var(--blue); }
   .header-sub {
-    margin-top: 16px;
-    font-size: 12px; letter-spacing: 0.08em;
-    color: var(--muted);
-    font-style: italic;
-    font-family: 'Instrument Serif', serif;
+    margin-top: 14px; font-size: 15px; font-weight: 400;
+    color: var(--text2); line-height: 1.65; max-width: 520px;
   }
 
-  /* ── FORM ── */
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
+  .field { margin-bottom: 22px; }
+  .field-label {
+    display: block; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text2); margin-bottom: 9px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
-  .form-full { grid-column: 1 / -1; }
+  .req { color: var(--blue); margin-left: 2px; }
+  .opt { color: var(--muted); font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 10px; margin-left: 4px; }
 
-  label {
-    display: block;
-    font-size: 9px; letter-spacing: 0.25em;
-    text-transform: uppercase; color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  input, select, textarea {
-    width: 100%;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    padding: 12px 14px;
-    outline: none;
+  input, textarea {
+    width: 100%; background: var(--card);
+    border: 1px solid var(--border2); border-radius: 10px;
+    color: var(--text); font-family: 'Inter', sans-serif;
+    font-size: 14px; padding: 13px 16px; outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
-    appearance: none;
   }
-  input::placeholder, textarea::placeholder { color: var(--muted2); }
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--amber-dim);
-    box-shadow: 0 0 0 3px var(--amber-glow2);
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  input:focus, textarea:focus {
+    border-color: var(--blue-border);
+    box-shadow: 0 0 0 3px var(--blue-glow);
   }
-  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
-  select option { background: var(--card); }
+  textarea { resize: vertical; min-height: 78px; line-height: 1.6; }
 
-  /* pill selectors */
-  .pill-row {
-    display: flex; flex-wrap: wrap; gap: 8px;
-  }
+  .pill-wrap { display: flex; flex-wrap: wrap; gap: 7px; }
   .pill {
-    padding: 7px 14px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    font-size: 11px; letter-spacing: 0.05em;
-    background: var(--card);
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: 'DM Mono', monospace;
+    padding: 7px 14px; border: 1px solid var(--border2);
+    border-radius: 100px; font-size: 13px; font-weight: 500;
+    background: var(--card); color: var(--text2);
+    cursor: pointer; transition: all 0.15s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    line-height: 1;
   }
-  .pill:hover { border-color: var(--amber-dim); color: var(--amber); }
-  .pill.active {
-    background: var(--amber-glow);
-    border-color: var(--amber);
-    color: var(--amber);
-  }
+  .pill:hover { border-color: var(--blue-border); color: var(--text); }
+  .pill.active { background: var(--blue-dim); border-color: var(--blue-border); color: var(--blue); }
 
-  /* ── GENERATE BUTTON ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media(max-width:580px) { .two-col { grid-template-columns: 1fr; } }
+
   .btn-generate {
-    width: 100%; margin-top: 24px;
-    padding: 18px;
-    background: var(--amber);
-    border: none; border-radius: 3px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px; letter-spacing: 0.12em;
-    color: #0d0d0d;
-    cursor: pointer;
-    position: relative; overflow: hidden;
-    transition: opacity 0.2s, transform 0.15s;
+    width: 100%; margin-top: 8px; padding: 15px;
+    background: var(--blue); border: none; border-radius: 12px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: -0.01em;
+    color: #fff; cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(91,124,250,0.3);
   }
-  .btn-generate:hover:not(:disabled) { opacity: 0.92; transform: translateY(-1px); }
+  .btn-generate:hover:not(:disabled) {
+    opacity: 0.9; transform: translateY(-1px);
+    box-shadow: 0 6px 28px rgba(91,124,250,0.4);
+  }
   .btn-generate:active:not(:disabled) { transform: translateY(0); }
-  .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-generate:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
 
-  .btn-generate .shimmer {
-    position: absolute; inset: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
-    transform: translateX(-100%);
-    animation: shimmer 2s infinite;
+  .status {
+    margin-top: 10px; padding: 11px 14px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 13px; color: var(--muted);
+    display: flex; align-items: center; gap: 8px; min-height: 42px;
   }
-  @keyframes shimmer { to { transform: translateX(200%); } }
-
-  /* ── STATUS BAR ── */
-  .status-bar {
-    margin-top: 16px;
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    font-size: 11px; color: var(--muted);
-    display: flex; align-items: center; gap: 8px;
-    background: var(--surface);
-    min-height: 40px;
-  }
-  .status-bar.loading { border-color: var(--amber-dim); color: var(--amber); }
+  .status.loading { border-color: var(--blue-border); color: var(--blue); }
   .spinner {
-    width: 12px; height: 12px;
-    border: 2px solid var(--amber-dim);
-    border-top-color: var(--amber);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    flex-shrink: 0;
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 2px solid var(--blue-dim); border-top-color: var(--blue);
+    animation: spin 0.65s linear infinite; flex-shrink: 0;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── DIVIDER ── */
-  .section-divider {
-    display: flex; align-items: center; gap: 16px;
-    margin: 48px 0 32px;
-  }
-  .section-divider::before, .section-divider::after {
-    content: ''; flex: 1; height: 1px; background: var(--border);
-  }
-  .section-label {
-    font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
-    color: var(--muted); white-space: nowrap;
+  .error-box {
+    margin-top: 10px; padding: 12px 14px; border-radius: 10px;
+    border: 1px solid rgba(248,113,113,0.25);
+    background: rgba(248,113,113,0.06);
+    font-size: 13px; color: var(--red);
   }
 
-  /* ── OUTPUT CARDS ── */
-  .output-card {
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--card);
-    margin-bottom: 16px;
-    overflow: hidden;
+  .divider {
+    display: flex; align-items: center; gap: 14px;
+    margin: 52px 0 32px;
+  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .divider span {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+    font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap;
+  }
+
+  .out-card {
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 14px; overflow: hidden; margin-bottom: 12px;
     animation: fadeUp 0.3s ease both;
   }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .card-header {
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .out-head {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
+    padding: 11px 18px; border-bottom: 1px solid var(--border);
+    background: var(--card2);
   }
-  .card-label {
-    font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
-    color: var(--amber);
+  .out-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--blue);
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
   .copy-btn {
-    padding: 4px 10px;
-    font-size: 10px; letter-spacing: 0.1em;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    font-family: 'DM Mono', monospace;
-    transition: all 0.15s;
+    padding: 4px 10px; font-size: 11px; font-weight: 600;
+    border: 1px solid var(--border2); border-radius: 6px;
+    background: transparent; color: var(--text2); cursor: pointer;
+    transition: all 0.15s; font-family: 'Plus Jakarta Sans', sans-serif;
   }
-  .copy-btn:hover { border-color: var(--amber-dim); color: var(--amber); }
-  .copy-btn.copied { border-color: #22c55e; color: #22c55e; }
+  .copy-btn:hover { border-color: var(--blue-border); color: var(--blue); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
 
-  .card-body {
-    padding: 20px;
-    font-size: 13px; line-height: 1.75;
-    color: var(--text);
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
+  .out-body { padding: 20px; font-size: 14px; line-height: 1.75; }
 
-  /* titles list */
-  .title-item {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .title-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .title-num {
-    font-family: 'Bebas Neue'; font-size: 22px;
-    color: var(--amber); flex-shrink: 0; line-height: 1;
-    padding-top: 2px;
-  }
-  .title-text { font-size: 14px; line-height: 1.5; }
+  .title-row { display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .title-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .title-n { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 11px; color: var(--blue); flex-shrink: 0; padding-top: 3px; letter-spacing: 0.04em; }
+  .title-t { font-size: 14px; line-height: 1.55; font-weight: 500; color: var(--text); }
 
-  /* script segments */
-  .script-segment {
-    margin-bottom: 20px; padding-bottom: 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  .script-segment:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .seg { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .seg:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .seg-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
   .seg-ts {
-    font-size: 10px; color: var(--amber);
-    letter-spacing: 0.15em; margin-bottom: 6px;
-    font-family: 'Bebas Neue'; font-size: 14px;
+    font-size: 11px; font-weight: 700; color: var(--blue);
+    font-family: 'Plus Jakarta Sans'; letter-spacing: 0.03em;
+    background: var(--blue-dim); border: 1px solid var(--blue-border);
+    padding: 3px 9px; border-radius: 6px;
   }
+  .seg-sec { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; font-family: 'Plus Jakarta Sans'; }
+  .seg-text { font-size: 14px; line-height: 1.8; color: var(--text); }
   .seg-broll {
-    margin-top: 8px; padding: 8px 12px;
-    background: var(--surface); border-left: 2px solid var(--amber-dim);
-    border-radius: 0 2px 2px 0;
-    font-size: 11px; color: var(--muted);
-    font-style: italic;
+    margin-top: 10px; padding: 9px 14px;
+    background: var(--card2); border-left: 2px solid var(--blue-border);
+    border-radius: 0 8px 8px 0; font-size: 12px; color: var(--text2);
+    font-style: italic; line-height: 1.6;
   }
-  .seg-broll::before { content: '🎬  '; }
 
-  /* tags */
-  .tags-wrap { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; }
+  .tags-wrap { padding: 16px 20px; display: flex; flex-wrap: wrap; gap: 7px; }
   .tag {
-    padding: 5px 10px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    font-size: 11px; color: var(--muted);
-    background: var(--surface);
+    padding: 5px 11px; border: 1px solid var(--border2);
+    border-radius: 100px; font-size: 12px; color: var(--text2);
+    background: var(--card2); font-family: 'Plus Jakarta Sans'; font-weight: 500;
   }
 
-  /* ── ERROR ── */
-  .error-box {
-    padding: 14px 16px;
-    border: 1px solid var(--red);
-    border-radius: 3px;
-    background: rgba(239,68,68,0.07);
-    font-size: 12px; color: var(--red);
-    margin-top: 16px;
-  }
-
-  /* ── FOOTER ── */
   .footer {
-    margin-top: 64px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
+    margin-top: 72px; padding-top: 24px; border-top: 1px solid var(--border);
     display: flex; justify-content: space-between; align-items: center;
-    font-size: 10px; letter-spacing: 0.12em; color: var(--muted2);
-    text-transform: uppercase;
+    font-size: 12px; color: var(--muted);
+    font-family: 'Plus Jakarta Sans'; font-weight: 500;
   }
-  .footer-mark { color: var(--amber); font-family: 'Bebas Neue'; font-size: 16px; letter-spacing: 0.1em; }
+  .footer-logo { font-weight: 800; font-size: 14px; letter-spacing: -0.02em; color: var(--text2); }
+  .footer-logo span { color: var(--blue); }
 `;
 
-const VIDEO_STYLES = ["Educational", "Listicle", "Documentary", "Story-Time", "Expose / Deep-Dive", "Motivational"];
+const VIDEO_STYLES = ["Educational", "Listicle", "Documentary", "Story-Time", "Exposé / Deep-Dive", "Motivational"];
 const DURATIONS = ["30–60 sec", "3–5 min", "7–10 min", "12–15 min", "20+ min"];
 const TONES = ["Calm & Authoritative", "Hype & Energetic", "Dark & Mysterious", "Conversational"];
 
-function CopyButton({ text }) {
+function CopyBtn({ text }) {
   const [copied, setCopied] = useState(false);
-  const copy = () => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
   return (
-    <button className={`copy-btn${copied ? " copied" : ""}`} onClick={copy}>
-      {copied ? "✓ COPIED" : "COPY"}
-    </button>
+    <button className={`copy-btn${copied ? " copied" : ""}`} onClick={() => {
+      navigator.clipboard.writeText(text);
+      setCopied(true); setTimeout(() => setCopied(false), 2000);
+    }}>{copied ? "✓ Copied" : "Copy"}</button>
   );
 }
 
-function OutputCard({ label, children, copyText }) {
+function OutCard({ label, copyText, children }) {
   return (
-    <div className="output-card">
-      <div className="card-header">
-        <span className="card-label">{label}</span>
-        {copyText && <CopyButton text={copyText} />}
+    <div className="out-card">
+      <div className="out-head">
+        <span className="out-label">{label}</span>
+        {copyText && <CopyBtn text={copyText} />}
       </div>
       {children}
     </div>
@@ -345,11 +276,11 @@ function OutputCard({ label, children, copyText }) {
 export default function VaultScript() {
   const [niche, setNiche] = useState("");
   const [angle, setAngle] = useState("");
-  const [videoStyle, setVideoStyle] = useState("Educational");
+  const [style, setStyle] = useState("Educational");
   const [duration, setDuration] = useState("7–10 min");
   const [tone, setTone] = useState("Calm & Authoritative");
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("Ready to forge your script.");
+  const [status, setStatus] = useState("Ready to generate your script.");
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
   const outputRef = useRef(null);
@@ -357,57 +288,9 @@ export default function VaultScript() {
   async function generate() {
     if (!niche.trim()) { setError("Please enter a niche or topic."); return; }
     setError(""); setResult(null); setLoading(true);
-    setStatus("Analyzing your niche...");
-
-    const prompt = `You are an elite faceless YouTube scriptwriter. Generate a complete, ready-to-record YouTube script package.
-
-INPUTS:
-- Niche / Topic: ${niche}
-- Specific angle or hook idea: ${angle || "Your choice — pick the most viral angle"}
-- Video style: ${videoStyle}
-- Target duration: ${duration}
-- Tone: ${tone}
-
-Respond ONLY with a valid JSON object (no markdown, no backticks, no preamble). Use this exact structure:
-
-{
-  "titles": [
-    "Title option 1 (SEO-optimized, curiosity-driven)",
-    "Title option 2",
-    "Title option 3"
-  ],
-  "hook": "First 30–45 seconds spoken word hook. Must be gripping. No intro fluff.",
-  "script": [
-    {
-      "timestamp": "0:00 – 0:45",
-      "section": "HOOK",
-      "narration": "The full spoken narration for this section.",
-      "broll": "Specific b-roll / visual suggestion for this section"
-    },
-    {
-      "timestamp": "0:45 – 2:00",
-      "section": "INTRO / SETUP",
-      "narration": "...",
-      "broll": "..."
-    }
-  ],
-  "description": "Full YouTube video description (150–200 words). SEO-rich. Include call to action.",
-  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10", "tag11", "tag12"],
-  "thumbnail_idea": "One specific thumbnail concept with text overlay suggestion and visual composition."
-}
-
-The script array should have 6–10 sections appropriate for the target duration. Make the narration conversational, punchy, and perfectly paced for a faceless YouTube channel. Use pattern interrupts. No filler.`;
-
-    const statuses = [
-      "Analyzing your niche...",
-      "Crafting viral title hooks...",
-      "Writing the script...",
-      "Polishing narration...",
-      "Generating SEO metadata...",
-    ];
-    let i = 0;
-    const ticker = setInterval(() => { i = (i + 1) % statuses.length; setStatus(statuses[i]); }, 2200);
-
+    const statuses = ["Analyzing your niche...", "Crafting viral titles...", "Writing your script...", "Polishing the narration...", "Generating SEO metadata..."];
+    let i = 0; setStatus(statuses[0]);
+    const ticker = setInterval(() => { i = (i + 1) % statuses.length; setStatus(statuses[i]); }, 2000);
     try {
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -415,88 +298,95 @@ The script array should have 6–10 sections appropriate for the target duration
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
           max_tokens: 4000,
-          messages: [{ role: "user", content: prompt }],
+          messages: [{ role: "user", content: `You are an elite faceless YouTube scriptwriter. Generate a complete script package.
+
+INPUTS:
+- Niche / Topic: ${niche}
+- Specific angle: ${angle || "Choose the most viral angle"}
+- Video style: ${style}
+- Target duration: ${duration}
+- Tone: ${tone}
+
+Respond ONLY with valid JSON (no markdown, no backticks):
+{
+  "titles": ["SEO title 1", "SEO title 2", "SEO title 3"],
+  "hook": "First 30-45 seconds spoken word hook. Gripping, no fluff.",
+  "script": [
+    { "timestamp": "0:00 – 0:45", "section": "HOOK", "narration": "Full narration text.", "broll": "Specific b-roll suggestion" }
+  ],
+  "description": "150-200 word YouTube description with CTA and keywords.",
+  "tags": ["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9","tag10","tag11","tag12"],
+  "thumbnail_idea": "Specific thumbnail concept with text overlay and composition."
+}
+
+Include 6-10 script sections. Make narration conversational and punchy. No filler.` }],
         }),
       });
-
       clearInterval(ticker);
-
       if (!res.ok) throw new Error(`API error ${res.status}`);
       const data = await res.json();
       const raw = data.content?.map(b => b.text || "").join("") || "";
-      const clean = raw.replace(/```json|```/g, "").trim();
-      const parsed = JSON.parse(clean);
+      const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
       setResult(parsed);
-      setStatus("Script forged. Ready to record.");
+      setStatus("Script ready.");
       setTimeout(() => outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch (e) {
       clearInterval(ticker);
       setError("Generation failed: " + e.message);
-      setStatus("Error — please try again.");
-    } finally {
-      setLoading(false);
-    }
+      setStatus("Something went wrong — try again.");
+    } finally { setLoading(false); }
   }
 
-  const fullScriptText = result
-    ? result.script?.map(s => `[${s.timestamp}] ${s.section}\n${s.narration}\nB-ROLL: ${s.broll}`).join("\n\n")
-    : "";
+  const fullScript = result?.script?.map(s => `[${s.timestamp}] ${s.section}\n${s.narration}\nB-ROLL: ${s.broll}`).join("\n\n") || "";
 
   return (
     <>
       <style>{STYLES}</style>
-      <div className="noise" />
-      <div className="glow-orb" />
+      <div className="grid-bg" />
+      <div className="glow" />
       <div className="app">
-
-        {/* HEADER */}
         <header className="header">
-          <div className="header-badge">AI Script Generator</div>
-          <h1>VAULT<span>SCRIPT</span></h1>
-          <p className="header-sub">Forge faceless YouTube scripts that rank, retain, and convert.</p>
+          <div className="header-top">
+            <div className="logo">Vault<span>Script</span></div>
+            <div className="header-badge">AI Script Generator</div>
+          </div>
+          <h1>Generate your<br/>next <em>viral script.</em></h1>
+          <p className="header-sub">From niche to publish-ready script in seconds. Titles, hook, full timestamped script, b-roll cues, description and tags.</p>
         </header>
 
-        {/* FORM */}
-        <div className="form-grid">
-          <div className="form-full">
-            <label>Niche / Topic *</label>
-            <input
-              value={niche}
-              onChange={e => setNiche(e.target.value)}
-              placeholder="e.g. abandoned places, dark history, AI investing, stoicism..."
-            />
-          </div>
+        <div className="field">
+          <label className="field-label">Niche / Topic <span className="req">*</span></label>
+          <input value={niche} onChange={e => setNiche(e.target.value)}
+            placeholder="e.g. abandoned places, stoicism, dark history, AI investing..." />
+        </div>
 
-          <div className="form-full">
-            <label>Specific angle or hook idea (optional)</label>
-            <textarea
-              value={angle}
-              onChange={e => setAngle(e.target.value)}
-              placeholder="e.g. 'The hotel that was abandoned mid-renovation and never reopened' — or leave blank and we'll choose the most viral angle"
-            />
-          </div>
+        <div className="field">
+          <label className="field-label">Specific Angle <span className="opt">optional</span></label>
+          <textarea value={angle} onChange={e => setAngle(e.target.value)}
+            placeholder="e.g. 'The hotel abandoned mid-renovation' — or leave blank for the most viral angle" />
+        </div>
 
-          <div className="form-full">
-            <label>Video Style</label>
-            <div className="pill-row">
-              {VIDEO_STYLES.map(s => (
-                <button key={s} className={`pill${videoStyle === s ? " active" : ""}`} onClick={() => setVideoStyle(s)}>{s}</button>
-              ))}
-            </div>
+        <div className="field">
+          <label className="field-label">Video Style</label>
+          <div className="pill-wrap">
+            {VIDEO_STYLES.map(s => (
+              <button key={s} className={`pill${style === s ? " active" : ""}`} onClick={() => setStyle(s)}>{s}</button>
+            ))}
           </div>
+        </div>
 
-          <div>
-            <label>Target Duration</label>
-            <div className="pill-row">
+        <div className="two-col">
+          <div className="field">
+            <label className="field-label">Duration</label>
+            <div className="pill-wrap">
               {DURATIONS.map(d => (
                 <button key={d} className={`pill${duration === d ? " active" : ""}`} onClick={() => setDuration(d)}>{d}</button>
               ))}
             </div>
           </div>
-
-          <div>
-            <label>Narration Tone</label>
-            <div className="pill-row">
+          <div className="field">
+            <label className="field-label">Tone</label>
+            <div className="pill-wrap">
               {TONES.map(t => (
                 <button key={t} className={`pill${tone === t ? " active" : ""}`} onClick={() => setTone(t)}>{t}</button>
               ))}
@@ -505,80 +395,72 @@ The script array should have 6–10 sections appropriate for the target duration
         </div>
 
         <button className="btn-generate" onClick={generate} disabled={loading}>
-          {loading && <span className="shimmer" />}
-          {loading ? "FORGING SCRIPT..." : "⚡ GENERATE SCRIPT"}
+          {loading ? "Generating..." : "Generate Script →"}
         </button>
-
-        <div className={`status-bar${loading ? " loading" : ""}`}>
+        <div className={`status${loading ? " loading" : ""}`}>
           {loading && <div className="spinner" />}
           <span>{status}</span>
         </div>
-
         {error && <div className="error-box">⚠ {error}</div>}
 
-        {/* OUTPUT */}
         {result && (
           <div ref={outputRef}>
-            <div className="section-divider"><span className="section-label">Generated Output</span></div>
+            <div className="divider"><span>Generated Output</span></div>
 
-            {/* TITLES */}
-            <OutputCard label="Title Options (A/B Test These)" copyText={result.titles?.join("\n")}>
-              <div className="card-body" style={{ padding: "16px 20px" }}>
+            <OutCard label="Title Options" copyText={result.titles?.join("\n")}>
+              <div className="out-body" style={{padding:"16px 20px"}}>
                 {result.titles?.map((t, i) => (
-                  <div className="title-item" key={i}>
-                    <span className="title-num">{String(i + 1).padStart(2, "0")}</span>
-                    <span className="title-text">{t}</span>
+                  <div className="title-row" key={i}>
+                    <span className="title-n">0{i+1}</span>
+                    <span className="title-t">{t}</span>
                   </div>
                 ))}
               </div>
-            </OutputCard>
+            </OutCard>
 
-            {/* HOOK */}
-            <OutputCard label="Opening Hook (First 45 Seconds)" copyText={result.hook}>
-              <div className="card-body">{result.hook}</div>
-            </OutputCard>
+            <OutCard label="Opening Hook" copyText={result.hook}>
+              <div className="out-body">{result.hook}</div>
+            </OutCard>
 
-            {/* FULL SCRIPT */}
-            <OutputCard label="Full Script" copyText={fullScriptText}>
-              <div className="card-body" style={{ padding: "20px" }}>
+            <OutCard label="Full Script" copyText={fullScript}>
+              <div className="out-body">
                 {result.script?.map((seg, i) => (
-                  <div className="script-segment" key={i} style={{ animationDelay: `${i * 0.05}s` }}>
-                    <div className="seg-ts">[{seg.timestamp}] — {seg.section}</div>
-                    <div style={{ fontSize: 13, lineHeight: 1.8 }}>{seg.narration}</div>
-                    {seg.broll && <div className="seg-broll">{seg.broll}</div>}
+                  <div className="seg" key={i}>
+                    <div className="seg-meta">
+                      <span className="seg-ts">{seg.timestamp}</span>
+                      <span className="seg-sec">{seg.section}</span>
+                    </div>
+                    <div className="seg-text">{seg.narration}</div>
+                    {seg.broll && <div className="seg-broll">🎬 {seg.broll}</div>}
                   </div>
                 ))}
               </div>
-            </OutputCard>
+            </OutCard>
 
-            {/* THUMBNAIL */}
             {result.thumbnail_idea && (
-              <OutputCard label="Thumbnail Concept" copyText={result.thumbnail_idea}>
-                <div className="card-body">{result.thumbnail_idea}</div>
-              </OutputCard>
+              <OutCard label="Thumbnail Concept" copyText={result.thumbnail_idea}>
+                <div className="out-body">{result.thumbnail_idea}</div>
+              </OutCard>
             )}
 
-            {/* DESCRIPTION */}
-            <OutputCard label="YouTube Description" copyText={result.description}>
-              <div className="card-body">{result.description}</div>
-            </OutputCard>
+            <OutCard label="YouTube Description" copyText={result.description}>
+              <div className="out-body">{result.description}</div>
+            </OutCard>
 
-            {/* TAGS */}
             {result.tags && (
-              <OutputCard label="SEO Tags" copyText={result.tags.join(", ")}>
+              <OutCard label="SEO Tags" copyText={result.tags.join(", ")}>
                 <div className="tags-wrap">
                   {result.tags.map((tag, i) => <span className="tag" key={i}>#{tag}</span>)}
                 </div>
-              </OutputCard>
+              </OutCard>
             )}
           </div>
         )}
 
         <footer className="footer">
-          <span className="footer-mark">VaultScript</span>
+          <div className="footer-logo">Vault<span>Script</span></div>
           <span>© 2026 VaultScript · All rights reserved</span>
         </footer>
       </div>
     </>
   );
-}
