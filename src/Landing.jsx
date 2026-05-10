@@ -493,11 +493,10 @@ function DemoSection() {
     let si = 0; setStatus(statuses[0]);
     const ticker = setInterval(() => { si=(si+1)%statuses.length; setStatus(statuses[si]); }, 1800);
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-6",
           max_tokens: 900,
           messages: [{ role: "user", content: `You are a viral faceless YouTube scriptwriter. Generate for:
 Niche: "${niche}", Style: ${style}, Duration: ${duration}, Tone: ${tone}
@@ -810,4 +809,4 @@ export default function LandingPage() {
       </footer>
     </>
   );
-        }
+            }
