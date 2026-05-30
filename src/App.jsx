@@ -291,12 +291,23 @@ export default function VaultScript() {
     const statuses = ["Analyzing your niche...", "Crafting viral titles...", "Writing your script...", "Polishing the narration...", "Generating SEO metadata..."];
     let i = 0; setStatus(statuses[0]);
     const ticker = setInterval(() => { i = (i + 1) % statuses.length; setStatus(statuses[i]); }, 2000);
+
+    const isShorts = duration === "30–60 sec";
+    const scriptInstruction = isShorts
+      ? "Include EXACTLY 2 fast-paced script sections (HOOK and MAIN). Total narration must be under 150 words to fit 30-60 seconds."
+      : "Include 6-10 script sections appropriate for the duration. Make narration conversational and punchy. No filler.";
+    const maxTokens = isShorts ? 1500 : 4000;
+
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-tool-secret": import.meta.env.VITE_TOOL_SECRET || "",
+        },
         body: JSON.stringify({
-          max_tokens: 4000,
+          type: "tool",
+          max_tokens: maxTokens,
           messages: [{ role: "user", content: `You are an elite faceless YouTube scriptwriter. Generate a complete script package.
 
 INPUTS:
@@ -318,7 +329,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
   "thumbnail_idea": "Specific thumbnail concept with text overlay and composition."
 }
 
-Include 6-10 script sections. Make narration conversational and punchy. No filler.` }],
+${scriptInstruction}` }],
         }),
       });
       clearInterval(ticker);
