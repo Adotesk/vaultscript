@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 
 const STYLES = `
@@ -497,6 +498,7 @@ function DemoSection() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          type: "demo",
           max_tokens: 900,
           messages: [{ role: "user", content: `You are a viral faceless YouTube scriptwriter. Generate for:
 Niche: "${niche}", Style: ${style}, Duration: ${duration}, Tone: ${tone}
@@ -809,4 +811,4 @@ export default function LandingPage() {
       </footer>
     </>
   );
-            }
+}
