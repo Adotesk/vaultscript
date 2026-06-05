@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 
 const STYLES = `
@@ -763,7 +762,7 @@ export default function LandingPage() {
                 <li>Shorts (30–60 sec) mode</li>
                 <li>Copy-paste ready outputs</li>
               </ul>
-              <button className="price-btn">Get Starter</button>
+              <button className="price-btn" onClick={() => window.open('https://whop.com/vaultscript-56e4/starter-e2-012f/', '_blank')}>Get Starter</button>
             </div>
             <div className="price-card featured">
               <div className="price-badge">Most Popular</div>
@@ -779,7 +778,7 @@ export default function LandingPage() {
                 <li>Priority generation speed</li>
                 <li>New features first</li>
               </ul>
-              <button className="price-btn featured">Get Pro Access</button>
+              <button className="price-btn featured" onClick={() => window.open('https://whop.com/vaultscript-56e4/pro-bb-bf66/', '_blank')}>Get Pro Access</button>
             </div>
           </div>
         </section>
